@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaccine Recommendation Tool - Hayat Pharmacy</title>
+    <meta name="description" content="Get personalized vaccine recommendations based on your age and health profile at Hayat Pharmacy.">
+    
+    <!-- This tool is designed to integrate with the existing Hayat Pharmacy website -->
+    <!-- It uses minimal custom CSS to avoid conflicts with the existing theme -->
+    
+    <style>
+        /* Reset and base styles - minimal to avoid conflicts */
+        .vaccine-tool * {
+            box-sizing: border-box;
+        }
+
+        .vaccine-tool {
+            font-family: inherit; /* Use site's existing font */
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Main container with subtle Hayat-style design */
+        .vaccine-tool-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        /* Header section */
+        .vaccine-tool-header {
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3a5f 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .vaccine-tool-header h1 {
+            margin: 0 0 1rem 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .vaccine-tool-header p {
+            margin: 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Form content */
+        .vaccine-tool-content {
+            padding: 2rem;
+        }
+
+        .vaccine-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .vaccine-form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .vaccine-form-group input,
+        .vaccine-form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .vaccine-form-group input:focus,
+        .vaccine-form-group select:focus {
+            outline: none;
+            border-color: #2c5aa0;
+        }
+
+        /* Vaccine selection section */
+        .vaccine-selection {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .vaccine-selection h2 {
+            margin: 0 0 1rem 0;
+            color: #333;
+            font-size: 1.3rem;
+        }
+
+        .vaccine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .vaccine-checkbox-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .vaccine-checkbox-item:hover {
+            border-color: #2c5aa0;
+            background: #f8f9ff;
+        }
+
+        .vaccine-checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        .vaccine-checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Buttons */
+        .vaccine-button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .vaccine-btn {
+            background: #2c5aa0;
+            color: white;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 180px;
+        }
+
+        .vaccine-btn:hover {
+            background: #1e3a5f;
+            transform: translateY(-1px);
+        }
+
+        .vaccine-btn-secondary {
+            background: #6c757d;
+        }
+
+        .vaccine-btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* Results section */
+        .vaccine-results {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #2c5aa0;
+        }
+
+        .vaccine-results h2 {
+            margin: 0 0 1rem 0;
+            color: #333;
+        }
+
+        /* Loading animation */
+        .vaccine-loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .vaccine-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2c5aa0;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: vaccineSpinAnimation 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes vaccineSpinAnimation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Alert modal */
+        .vaccine-alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vaccine-alert-modal {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .vaccine-alert-modal button {
+            background: #2c5aa0;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .vaccine-tool {
+                margin: 1rem;
+                padding: 0;
+            }
+            
+            .vaccine-tool-header {
+                padding: 1.5rem 1rem;
+            }
+            
+            .vaccine-tool-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .vaccine-tool-content {
+                padding: 1.5rem 1rem;
+            }
+            
+            .vaccine-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .vaccine-button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Integration note */
+        .integration-note {
+            background: #e7f3ff;
+            border: 1px solid #b6d7ff;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            color: #0c5460;
+        }
+
+        .integration-note strong {
+            color: #084c61;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="vaccine-tool">
+        <div class="vaccine-tool-container">
+            <div class="vaccine-tool-header">
+                <h1>💉 Vaccine Recommendation Tool</h1>
+                <p>Get personalized vaccine recommendations based on your age and health profile</p>
+            </div>
+            
+            <div class="vaccine-tool-content">
+                <form id="hayat-vaccine-form">
+                    <div class="vaccine-form-group">
+                        <label for="hayat-dob">📅 Date of Birth:</label>
+                        <input type="date" id="hayat-dob" required>
+                    </div>
+                    
+                    <div class="vaccine-form-group">
+                        <label for="hayat-gender">👤 Gender:</label>
+                        <select id="hayat-gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                    
+                    <div class="vaccine-selection">
+                        <h2>🛡️ Select vaccines you would like to receive:</h2>
+                        
+                        <!-- Primary 2026 Vaccines -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #2c5aa0; margin-bottom: 1rem; font-size: 1.2rem;">Primary 2026 Vaccines</h3>
+                            <div class="vaccine-grid">
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-flushot" value="flushot">
+                                    <label for="hayat-flushot">Influenza (Flu) 2025</label>
+                                </div>
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-covid" value="covid">
+                                    <label for="hayat-covid">COVID-19 2025</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pneumonia Vaccines -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #2c5aa0; margin-bottom: 1rem; font-size: 1.2rem;">Pneumonia (Pneumococcal) - Following CDC Option B Schedule</h3>
+                            
+                            <!-- Vaccine Selection First -->
+                            <div class="vaccine-grid" style="margin-bottom: 1.5rem;">
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-pcv15" value="pcv15">
+                                    <label for="hayat-pcv15">PCV15 (Option B - Preferred)</label>
+                                </div>
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-pcv20" value="pcv20">
+                                    <label for="hayat-pcv20">PCV20 (Option A - Single dose)</label>
+                                </div>
+                            </div>
+
+                            <!-- Vaccine History Section for Recommendations -->
+                            <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 1rem; margin-bottom: 1rem;">
+                                <p style="margin: 0 0 0.5rem 0; font-size: 0.9rem;"><strong>💡 Help us recommend the right vaccine for you!</strong></p>
+                                <p style="margin: 0 0 0.75rem 0; font-size: 0.85rem;">Please check your prior pneumococcal vaccine history below - this will help determine which vaccine is most appropriate:</p>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
+                                    <label style="font-size: 0.85rem; margin: 0;">
+                                        <input type="checkbox" name="pneumonia-history" value="none" style="width: auto; margin-right: 0.3rem;">
+                                        None
+                                    </label>
+                                    <label style="font-size: 0.85rem; margin: 0;">
+                                        <input type="checkbox" name="pneumonia-history" value="pcv15-only" style="width: auto; margin-right: 0.3rem;">
+                                        PCV15 only
+                                    </label>
+                                    <label style="font-size: 0.85rem; margin: 0;">
+                                        <input type="checkbox" name="pneumonia-history" value="ppsv23-only" style="width: auto; margin-right: 0.3rem;">
+                                        PPSV23 only
+                                    </label>
+                                    <label style="font-size: 0.85rem; margin: 0;">
+                                        <input type="checkbox" name="pneumonia-history" value="pcv13-only" style="width: auto; margin-right: 0.3rem;">
+                                        PCV13 only
+                                    </label>
+                                    <label style="font-size: 0.85rem; margin: 0;">
+                                        <input type="checkbox" name="pneumonia-history" value="pcv15-ppsv23" style="width: auto; margin-right: 0.3rem;">
+                                        PCV15 & PPSV23
+                                    </label>
+                                    <label style="font-size: 0.85rem; margin: 0;">
+                                        <input type="checkbox" name="pneumonia-history" value="pcv20-pcv21" style="width: auto; margin-right: 0.3rem;">
+                                        PCV20 or PCV21
+                                    </label>
+                                    <label style="font-size: 0.85rem; margin: 0;">
+                                        <input type="checkbox" name="pneumonia-history" value="pcv13-ppsv23" style="width: auto; margin-right: 0.3rem;">
+                                        PCV13 & PPSV23 (at <65 yrs)
+                                    </label>
+                                    <label style="font-size: 0.85rem; margin: 0;">
+                                        <input type="checkbox" name="pneumonia-history" value="dont-know" style="width: auto; margin-right: 0.3rem;">
+                                        Don't know
+                                    </label>
+                                </div>
+                                <div style="margin-top: 0.75rem;">
+                                    <label for="last-pneumonia-dose" style="font-size: 0.85rem; margin-right: 0.5rem;">📅 Last pneumonia vaccine dose date (estimate is fine):</label>
+                                    <input type="date" id="last-pneumonia-dose" name="last-pneumonia-dose" style="width: auto; padding: 0.3rem; font-size: 0.85rem;">
+                                    <label style="font-size: 0.85rem; margin-left: 0.5rem;">
+                                        <input type="checkbox" name="last-dose-unknown" value="unknown" style="width: auto; margin-right: 0.3rem;">
+                                        Don't know
+                                    </label>
+                                </div>
+                                <p style="margin: 0.5rem 0 0 0; font-size: 0.8rem; font-style: italic; color: #856404;">👈 Check the recommendations below based on your history to help guide your vaccine choice above!</p>
+                            </div>
+
+                            <!-- CDC Option B Recommendations -->
+                            <div style="background: #e7f3ff; border: 1px solid #b6d7ff; border-radius: 6px; padding: 1rem; margin-bottom: 1rem;">
+                                <p style="margin: 0 0 0.5rem 0; font-weight: bold; color: #084c61;">CDC Option B Recommendations:</p>
+                                <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem;">
+                                    <li><strong>None:</strong> PCV15 → PPSV23 (≥1 year later)</li>
+                                    <li><strong>PCV15 only:</strong> PPSV23 (≥1 year after PCV15)</li>
+                                    <li><strong>PPSV23 only:</strong> PCV15 (≥1 year after PPSV23)</li>
+                                    <li><strong>PCV13 only:</strong> PCV20 or PCV21 (≥1 year after PCV13)</li>
+                                    <li><strong>PCV13 & PPSV23 (at <65 yrs):</strong> PCV20 or PCV21 (≥5 years after PPSV23)</li>
+                                    <li><strong>Complete series:</strong> No vaccines recommended; schedule is complete</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Age-Related Vaccines -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #2c5aa0; margin-bottom: 1rem; font-size: 1.2rem;">Age-Related Vaccines</h3>
+                            <div class="vaccine-grid">
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-rsv" value="rsv">
+                                    <label for="hayat-rsv">RSV (Adults ≥60 years)</label>
+                                </div>
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-shingles" value="shingles">
+                                    <label for="hayat-shingles">Shingrix (Shingles) - Adults ≥50 years</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Other Routine Vaccines -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #2c5aa0; margin-bottom: 1rem; font-size: 1.2rem;">Other Routine Vaccines</h3>
+                            <div class="vaccine-grid">
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-tdap" value="tdap">
+                                    <label for="hayat-tdap">Tdap/Td</label>
+                                </div>
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-hepa" value="hepa">
+                                    <label for="hayat-hepa">Hepatitis A</label>
+                                </div>
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-hepb" value="hepb">
+                                    <label for="hayat-hepb">Hepatitis B</label>
+                                </div>
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-mmr" value="mmr">
+                                    <label for="hayat-mmr">MMR</label>
+                                </div>
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-varicella" value="varicella">
+                                    <label for="hayat-varicella">Varicella (Chickenpox)</label>
+                                </div>
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-meningitis" value="meningitis">
+                                    <label for="hayat-meningitis">Meningococcal</label>
+                                </div>
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-hpv" value="hpv">
+                                    <label for="hayat-hpv">HPV</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Travel Vaccines -->
+                        <div style="margin-bottom: 1rem;">
+                            <h3 style="color: #2c5aa0; margin-bottom: 1rem; font-size: 1.2rem;">Travel Vaccines</h3>
+                            <div class="vaccine-grid">
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-typhoid" value="typhoid">
+                                    <label for="hayat-typhoid">Typhoid (Vivotif - oral)</label>
+                                </div>
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-yellow-fever" value="yellow-fever" onchange="hayatCheckYellowFever(this)">
+                                    <label for="hayat-yellow-fever">Yellow Fever (YF-Vax)</label>
+                                </div>
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-japanese-encephalitis" value="japanese-encephalitis">
+                                    <label for="hayat-japanese-encephalitis">Japanese Encephalitis</label>
+                                </div>
+                                <div class="vaccine-checkbox-item">
+                                    <input type="checkbox" id="hayat-meningococcal-travel" value="meningococcal-travel">
+                                    <label for="hayat-meningococcal-travel">Meningococcal (Travel/Hajj)</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="vaccine-button-group">
+                        <button type="button" class="vaccine-btn" onclick="hayatRunRecommendation()">
+                            🔍 Get Recommendations
+                        </button>
+                        <button type="button" class="vaccine-btn vaccine-btn-secondary" onclick="hayatShowSelected()">
+                            📋 Show Selected
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="vaccine-loading" id="hayat-loading">
+                    <div class="vaccine-spinner"></div>
+                    <p>Analyzing your profile...</p>
+                </div>
+                
+                <div class="vaccine-results" id="hayat-results">
+                    <h2>📊 Recommendations</h2>
+                    <p>Please fill out the form and click "Get Recommendations" to see your personalized vaccine recommendations based on CDC guidelines.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call-to-action section that matches Hayat's style -->
+        <div class="vaccine-tool-container">
+            <div style="padding: 2rem; text-align: center; background: #f8f9fa;">
+                <h2 style="color: #2c5aa0; margin-bottom: 1rem;">Ready to Get Vaccinated?</h2>
+                <p style="margin-bottom: 1.5rem; font-size: 1.1rem;">Walk-in appointments are available at all Hayat Pharmacy locations for adults and children ages 6 and older.</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="https://www.hayatrx.com/locations/" class="vaccine-btn" style="text-decoration: none; display: inline-block;">Find a Location</a>
+                    <a href="https://www.hayatrx.com/health-services/vaccines/" class="vaccine-btn vaccine-btn-secondary" style="text-decoration: none; display: inline-block;">Learn More About Our Vaccines</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // All function names prefixed with 'hayat' to avoid conflicts
+        function hayatCheckYellowFever(checkbox) {
+            if (checkbox.checked) {
+                hayatShowSpecialAlert();
+            }
+        }
+
+        function hayatShowSpecialAlert() {
+            const alertOverlay = document.createElement('div');
+            alertOverlay.className = 'vaccine-alert-overlay';
+            
+            alertOverlay.innerHTML = `
+                <div class="vaccine-alert-modal" style="max-width: 500px; text-align: left;">
+                    <div style="text-align: center; font-size: 3rem; margin-bottom: 1rem;">🌟</div>
+                    <h3 style="text-align: center; color: #2c5aa0; margin-bottom: 1.5rem; font-size: 1.3rem;">Yellow Fever Vaccine - Special Instructions</h3>
+                    
+                    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
+                        <p style="margin: 0 0 1rem 0; font-weight: 600; color: #856404;">This is a special vaccine requiring specific handling.</p>
+                        <p style="margin: 0; color: #856404;">Please contact our central location for this service:</p>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                            <span style="font-size: 1.5rem; margin-right: 0.75rem;">📍</span>
+                            <div>
+                                <strong>Location:</strong><br>
+                                <span style="color: #666;">807 W Layton Ave, Milwaukee, WI</span>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                            <span style="font-size: 1.5rem; margin-right: 0.75rem;">📞</span>
+                            <div>
+                                <strong>Phone:</strong><br>
+                                <span style="color: #666;">414-483-0000</span>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center;">
+                            <span style="font-size: 1.5rem; margin-right: 0.75rem;">👨‍⚕️</span>
+                            <div>
+                                <strong>Ask for:</strong><br>
+                                <span style="color: #666;">Pharmacist Brian</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="this.closest('.vaccine-alert-overlay').remove();" style="width: 100%; padding: 0.875rem; background: #2c5aa0; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                        Got it!
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(alertOverlay);
+        }
+
+        function hayatCalculateAge(dob) {
+            const birthDate = new Date(dob);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        function hayatRunRecommendation() {
+            const dob = document.getElementById('hayat-dob').value;
+            const gender = document.getElementById('hayat-gender').value;
+
+            if (!dob || !gender) {
+                hayatShowAlert('Please enter your date of birth and gender.', 'warning');
+                return;
+            }
+
+            hayatShowLoading();
+
+            setTimeout(() => {
+                const age = hayatCalculateAge(dob);
+                let recommendations = '<h3>✅ Recommended Vaccines for You:</h3><ul class="vaccine-list">';
+                let recommended = false;
+
+                // Flu Shot - Age-based recommendations
+                if (age >= 0.5) {
+                    if (age >= 65) {
+                        recommendations += '<li><strong>💉 High-Dose Influenza (Flu) 2025</strong> - Recommended annually for adults ≥65 years</li>';
+                    } else {
+                        recommendations += '<li><strong>💉 Standard-Dose Influenza (Flu) 2025</strong> - Recommended annually</li>';
+                    }
+                    recommended = true;
+                }
+
+                // COVID-19
+                if (age >= 0.5) {
+                    recommendations += '<li><strong>🦠 COVID-19 Vaccine</strong> - Stay up to date with current vaccines</li>';
+                    recommended = true;
+                }
+
+                // Pneumonia - Option B (PCV15 then PPSV23)
+                if (age >= 50) {
+                    recommendations += '<li><strong>🫁 Pneumonia Option B: PCV15</strong> - Followed by PPSV23 ≥1 year later</li>';
+                    recommended = true;
+                }
+
+                // Shingles
+                if (age >= 50) {
+                    recommendations += '<li><strong>🛡️ Shingles (Shingrix)</strong> - Two doses recommended</li>';
+                    recommended = true;
+                }
+
+                // RSV
+                if (age >= 60) {
+                    recommendations += '<li><strong>🌡️ RSV Vaccine</strong> - Protects against respiratory syncytial virus</li>';
+                    recommended = true;
+                }
+
+                // Tdap
+                if (age >= 7) {
+                    recommendations += '<li><strong>💪 Tdap/Td</strong> - One dose, then Td booster every 10 years</li>';
+                    recommended = true;
+                }
+
+                if (!recommended) {
+                    recommendations = '<div style="text-align: center; padding: 1.5rem;"><div style="font-size: 2.5rem; margin-bottom: 1rem;">👨‍⚕️</div><h3>Consult Your Healthcare Provider</h3><p>No specific age-based recommendations. Please discuss with your healthcare provider for personalized advice.</p></div>';
+                } else {
+                    recommendations += '</ul><div class="warning-box"><p><strong>⚠️ Important:</strong> These are general recommendations based on CDC guidelines. Please consult with a Hayat Pharmacy pharmacist for personalized medical advice.</p></div>';
+                }
+
+                hayatHideLoading();
+                hayatOpenResultsWindow(recommendations);
+            }, 1500);
+        }
+
+        function hayatShowSelected() {
+            const selectedVaccines = Array.from(document.querySelectorAll('.vaccine-checkbox-item input:checked')).map(checkbox => {
+                return checkbox.nextElementSibling.textContent;
+            });
+
+            if (selectedVaccines.length === 0) {
+                hayatShowAlert('Please select at least one vaccine.', 'warning');
+                return;
+            }
+
+            hayatShowLoading();
+            
+            setTimeout(() => {
+                let results = '<h3>📋 Your Selected Vaccines:</h3><ul class="vaccine-list">';
+                selectedVaccines.forEach(vaccine => {
+                    results += `<li>✓ ${vaccine}</li>`;
+                });
+                results += '</ul><div class="next-steps"><p><strong>💡 Next Steps:</strong> Visit any Hayat Pharmacy location to discuss availability and scheduling. Walk-ins welcome for ages 6+!</p></div>';
+                
+                hayatHideLoading();
+                hayatOpenResultsWindow(results);
+            }, 800);
+        }
+
+        function hayatShowLoading() {
+            document.getElementById('hayat-loading').style.display = 'block';
+            document.getElementById('hayat-results').style.opacity = '0.5';
+        }
+
+        function hayatHideLoading() {
+            document.getElementById('hayat-loading').style.display = 'none';
+            document.getElementById('hayat-results').style.opacity = '1';
+        }
+
+        function hayatShowAlert(message, type) {
+            const alertOverlay = document.createElement('div');
+            alertOverlay.className = 'vaccine-alert-overlay';
+            
+            const icon = type === 'warning' ? '⚠️' : 'ℹ️';
+            alertOverlay.innerHTML = `
+                <div class="vaccine-alert-modal">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">${icon}</div>
+                    <p style="font-size: 1.1rem; margin-bottom: 1.5rem; color: #333;">${message}</p>
+                    <button onclick="this.closest('.vaccine-alert-overlay').remove();">OK</button>
+                </div>
+            `;
+            
+            document.body.appendChild(alertOverlay);
+        }
+
+        function hayatOpenResultsWindow(content) {
+            const resultsWindow = window.open('', 'Hayat Vaccine Recommendations', 'width=700,height=600');
+            resultsWindow.document.write(`
+                <html>
+                <head>
+                    <title>Hayat Pharmacy - Vaccine Recommendations</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            background: #f8f9fa;
+                            padding: 1rem;
+                            line-height: 1.4;
+                            font-size: 0.9rem;
+                        }
+                        .container {
+                            max-width: 600px;
+                            margin: 0 auto;
+                            background: white;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                            overflow: hidden;
+                        }
+                        .header {
+                            background: linear-gradient(135deg, #2c5aa0 0%, #1e3a5f 100%);
+                            padding: 1rem;
+                            text-align: center;
+                            color: white;
+                        }
+                        .header h2 {
+                            font-size: 1.3rem;
+                            font-weight: 700;
+                            margin-bottom: 0.3rem;
+                        }
+                        .content { 
+                            padding: 1rem; 
+                        }
+                        .content h3 { 
+                            color: #333; 
+                            margin-bottom: 0.75rem; 
+                            font-size: 1.1rem; 
+                        }
+                        .vaccine-list {
+                            list-style: none;
+                            padding: 0;
+                            margin: 0;
+                        }
+                        .vaccine-list li {
+                            padding: 0.4rem 0.75rem;
+                            margin: 0.3rem 0;
+                            background: #f8f9ff;
+                            border-left: 3px solid #2c5aa0;
+                            border-radius: 3px;
+                            font-size: 0.85rem;
+                        }
+                        .next-steps {
+                            margin-top: 1rem;
+                            padding: 0.75rem;
+                            background: #d4edda;
+                            border-left: 3px solid #28a745;
+                            border-radius: 3px;
+                            font-size: 0.8rem;
+                        }
+                        .warning-box {
+                            margin-top: 1rem;
+                            padding: 0.75rem;
+                            background: #fff3cd;
+                            border-left: 3px solid #ffc107;
+                            border-radius: 3px;
+                            font-size: 0.8rem;
+                        }
+                        button { 
+                            margin-top: 1rem; 
+                            padding: 0.75rem 1.5rem; 
+                            background: #2c5aa0;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-size: 0.9rem;
+                            font-weight: 600;
+                            display: block;
+                            margin-left: auto;
+                            margin-right: auto;
+                        }
+                        button:hover { background: #1e3a5f; }
+                        .footer {
+                            background: #f8f9fa;
+                            padding: 1rem;
+                            text-align: center;
+                            border-top: 1px solid #dee2e6;
+                            font-size: 0.8rem;
+                        }
+                        
+                        /* Print-specific styles */
+                        @media print {
+                            body { 
+                                background: white; 
+                                padding: 0.5rem;
+                                font-size: 0.8rem;
+                                line-height: 1.3;
+                            }
+                            .container { 
+                                box-shadow: none; 
+                                border: 1px solid #ccc;
+                                page-break-inside: avoid;
+                            }
+                            .header { 
+                                padding: 0.75rem;
+                                -webkit-print-color-adjust: exact;
+                                color-adjust: exact;
+                            }
+                            .header h2 { 
+                                font-size: 1.1rem; 
+                                margin-bottom: 0.2rem;
+                            }
+                            .content { 
+                                padding: 0.75rem; 
+                            }
+                            .content h3 { 
+                                font-size: 1rem; 
+                                margin-bottom: 0.5rem;
+                            }
+                            .vaccine-list li {
+                                padding: 0.25rem 0.5rem;
+                                margin: 0.2rem 0;
+                                font-size: 0.75rem;
+                                page-break-inside: avoid;
+                            }
+                            .next-steps, .warning-box {
+                                padding: 0.5rem;
+                                margin-top: 0.75rem;
+                                font-size: 0.7rem;
+                                page-break-inside: avoid;
+                            }
+                            .footer { 
+                                padding: 0.75rem;
+                                font-size: 0.7rem;
+                            }
+                            button { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h2>💉 Hayat Pharmacy<br>Vaccine Recommendations</h2>
+                        </div>
+                        <div class="content">
+                            ${content}
+                            <button onclick="window.print()">🖨️ Print Recommendations</button>
+                        </div>
+                        <div class="footer">
+                            <p><strong>Contact Hayat Pharmacy:</strong><br>
+                            Visit <a href="https://www.hayatrx.com/locations/" target="_blank">hayatrx.com/locations</a> to find your nearest location<br>
+                            Walk-in vaccines available for ages 6+</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            resultsWindow.document.close();
+        }
+    </script>
+</body>
+</html>
