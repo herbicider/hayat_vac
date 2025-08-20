@@ -127,7 +127,6 @@ This tool was developed for Hayat Pharmacy to streamline vaccine consultations a
 
 For technical issues or questions about this tool:
 - Create an issue in this repository
-- Contact: [Your contact information]
 
 For vaccine-related questions:
 - Contact Hayat Pharmacy directly at your nearest location
