@@ -27,8 +27,8 @@ A comprehensive, user-friendly web application that provides personalized vaccin
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/hayat-vaccine-tool.git
-   cd hayat-vaccine-tool
+   git clone https://github.com/herbicider/hayat_vac.git
+   cd hayat_vac
    ```
 
 2. **Open the application**
