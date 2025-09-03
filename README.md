@@ -1,6 +1,10 @@
 # 💉 Hayat Pharmacy Vaccine Recommendation Tool
 
-A comprehensive, user-friendly web application that provides personalized vaccine recommendations based on CDC guidelines. Designed specifically for pharmacy use to help patients understand which vaccines they need based on their age, health profile, and vaccination history.
+A comprehensive, user-friendly web application that provides personalized vaccine recommendations based on CDC guidelines. Designed specifically for pharmacy use to help patients understand which vaccines they need based on their age, health profile, and vaccination history. Updated for 2025-2026. 
+
+*As of Sep 1st, 2026 the COVID vaccine recommendation is still unclear, Hayat has obtained a CPA to provide wide coverage of COVID vaccines*
+
+**One page purely on HTML and CSS codes**, you can drop this page into your pharmacy's website easily, by copying and pasting the full page code or add this html page to your website and point a link to it. Search "hayat pharmacy" in the code and replace to match your pharmacy's name for easy integration.
 
 ## 🌟 Features
 
